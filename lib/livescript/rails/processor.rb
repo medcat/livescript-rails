@@ -1,6 +1,11 @@
+require 'sprockets'
+
 module LiveScript
   module Rails
     module SprocketsProcessor
+      # only enable source map when sprockets >= 4.0
+      ENABLE_SOURCE_MAP = Sprockets::VERSION >= '4.0'
+
       def self.cache_key
         @cache_key ||= "#{name}:#{LiveScript::Source::VERSION}:#{LiveScript::VERSION}:#{LiveScript::Rails::VERSION}".freeze
       end
@@ -9,20 +14,23 @@ module LiveScript
         data = input[:data]
         options = {
           bare: true,
-          header: false,
-          map: 'linked-src',
-          filename: input[:source_path] || input[:filename],
+          header: true,
         }.merge(::Rails.application.config.assets.livescript || {})
+
+        options.merge!({
+          filename: input[:source_path] || input[:filename],
+          map: ENABLE_SOURCE_MAP ? 'linked-src' : 'none',
+        })
 
         result = input[:cache].fetch([self.cache_key, data]) do
           LiveScript.compile(data, options)
         end
 
-        # when map: none, result is String; otherwise, result is Hash
-        if result.kind_of? Hash
+        if ENABLE_SOURCE_MAP
+          map = Sprockets::SourceMapUtils.decode_vlq_mappings(result['map']['mappings'], sources: result['map']['sources'], names: result['map']['names'])
           {
             data: result['code'],
-            map: result['map'],
+            map: Sprockets::SourceMapUtils.combine_source_maps(input[:metadata][:map], map),
           }
         else
           result

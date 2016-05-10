@@ -4,6 +4,8 @@ LiveScript adapter for the Rails asset pipeline.
 
 Depends on [Roonin-mx/livescript-ruby](https://github.com/Roonin-mx/livescript-ruby) to compile LiveScript to javascript.
 
+Source map is available if `Sprockets` >= 4.0.
+
 ## Installation
 
 Add the following lines to your `Gemfile`:
@@ -25,15 +27,19 @@ end
 You can set compile options in `config/initializers/assets.rb`:
 
 ```
-# These are default options. User set options will override default options
 Rails.application.config.assets.livescript = {
-  bare: true,
   header: false,
-  map: 'linked-src',
 }
 ```
 
 See [Roonin-mx/livescript-ruby](https://github.com/Roonin-mx/livescript-ruby) for more options.
+
+Default options:
+
+* bare: true (for backward compatibility)
+* header: true
+
+`filename` and `map` options are set internally and not allowed to change.
 
 ## License
 
