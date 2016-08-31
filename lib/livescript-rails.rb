@@ -3,7 +3,7 @@ require 'livescript/rails/version'
 require 'livescript/rails/processor'
 require 'livescript/rails/railtie' if defined?(::Rails)
 
-module Livescript
+module LiveScript
   module Rails
     def self.register!
       Sprockets.register_mime_type 'text/livescript', extensions: ['.ls', '.js.ls']
