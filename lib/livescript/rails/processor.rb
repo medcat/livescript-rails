@@ -9,13 +9,17 @@ module LiveScript
       def self.cache_key
         @cache_key ||= "#{name}:#{LiveScript::Source::VERSION}:#{LiveScript::VERSION}:#{LiveScript::Rails::VERSION}".freeze
       end
+      
+      def self.rails_config
+        (::Rails.application.config.assets.livescript if defined?(::Rails)) || {}
+      end
 
       def self.call(input)
         data = input[:data]
         options = {
           bare: true,
           header: true,
-        }.merge(::Rails.application.config.assets.livescript || {})
+        }.merge(rails_config)
 
         options.merge!({
           filename: input[:source_path] || input[:filename],
